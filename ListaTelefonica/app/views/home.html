@@ -1,0 +1,111 @@
+<div class="container">
+    <br>
+    <!-- Painel Filtro -->
+    <div class="panel panel-primary">
+        <div class="panel-heading">Buscar</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label>Contato: </label>
+                <input type="text" id="criterioBusca" class="form-control" ng-model="vm.criterioBusca">
+            </div>
+        </div>
+    </div>
+
+
+    <h3>Lista de contatos</h3>
+    <!-- Grid com a lista de contatos -->
+    <table class="table table-striped table-bordered table-condensed table-hover">
+        <thead>
+            <tr ng-show="vm.contatos.length > 0">
+                <th class="text-center col-md-5">Nome</th>
+                <th class="text-center col-md-2">Cpf</th>
+                <th class="text-center col-md-1">Idade</th>
+                <th class="text-center col-md-2">Sexo</th>
+                <th class="text-center col-md-2">Operadora</th>
+                <th class="text-center col-md-2" colspan="2">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="contato in vm.contatos | filter : {nome: vm.criterioBusca} | orderBy: 'Nome' ">
+                <td class="">{{contato.nome}}</td>
+                <td class="text-center">{{contato.cpf}}</td>
+                <td class="text-center">{{contato.idade}}</td>
+                <td class="text-center">{{contato.sexo.nome}}</td>
+                <td class="text-center">{{contato.operadora.nome}}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm" ng-click="vm.excluir(contato)">
+                        Excluir
+                    </button>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-success btn-sm" ng-click="vm.open(contato)">
+                        Editar
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pull-right">
+        <button class="btn btn-primary" ng-click="vm.open()">Adicionar</button>
+        <a class="btn btn-primary" href="/app/views/teste.html">ir para teste</a>
+    </div>
+</div>
+
+
+
+<!-- Modal para adicionar/editar um contato -->
+<script type="text/ng-template" id="modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title"> {{vm.tituloModal}}</h3>
+    </div>
+    <div class="modal-body">
+        <form name="contatoForm" ng-submit="vm.save(vm.contato)" novalidate>
+            <div class="form-group" ng-class="{ 'has-error' : contatoForm.nome.$invalid && !contatoForm.nome.$pristine  }">
+                <label>Nome</label>
+                <input type="text" name="nome" class="form-control" ng-model="vm.contato.nome" ng-minlength="10" ng-required="true">
+            </div>
+            <div class="row">
+                <div class="col-md-3 form-group" ng-class="{ 'has-error' : contatoForm.cpf.$invalid && !contatoForm.cpf.$pristine }">
+                    <label>CPF</label>
+                    <input type="text" name="cpf" id="cpf" class="form-control" ng-model="vm.contato.cpf" ng-minlength="11" ng-maxlength="11">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="nome">Sexo: </label>
+                    <select name="sexoSelect" id="sexoSelect" class="form-control" ng-model="vm.contato.sexo" ng-options="sexo.nome for sexo in vm.sexos track by sexo.codigo">
+                        <option value="">Selecione seu sexo</option>
+                    </select>
+                </div>
+                <div class="col-md-2 form-group">
+                    <label for="nome">Idade: </label>
+                    <input type="number" id="idade" class="form-control" ng-model="vm.contato.idade">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="nome">Operadora: </label>
+                    <select name="operadoraSelect" id="operadoraSelect" class="form-control" ng-model="vm.contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in vm.operadoras track by operadora.codigo">
+                        <option value="">Selecione uma Operadora</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Exemplo usando ng-message -->
+            <div ng-messages="contatoForm.nome.$error" ng-if="contatoForm.nome.$invalid && !contatoForm.nome.$pristine" class="alert alert-danger">
+                <div ng-message="required">Por favor, preencha o campo nome.</div>
+                <div ng-message="minlength">O campo nome deve ter no minímo 10 caracteres.</div>
+            </div>
+
+            <div ng-messages="contatoForm.cpf.$error" ng-if="contatoForm.cpf.$invalid && !contatoForm.cpf.$pristine" class="alert alert-danger">
+                <div ng-message="minlength">O campo CPF deve ter no mínimo 11 caracteres.</div>
+                <div ng-message="maxlength">O campo CPF deve ter no máximo 11 caracteres.</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" ng-if="!vm.editar" ng-disabled="contatoForm.$invalid" class="btn btn-primary">Adicionar</button>
+                <button type="submit" ng-if="vm.editar" ng-disabled="contatoForm.$invalid" class="btn btn-success">Editar</button>
+                <button class="btn btn-warning" ng-click="vm.cancel()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+
+</script>
